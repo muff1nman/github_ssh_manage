@@ -1,8 +1,8 @@
 #! /usr/bin/env ruby
 #
-# Copyright © 2014 Andrew DeMaria (muff1nman) <ademaria@mines.edu>
+# Copyright © 2014 Andrew DeMaria (muff1nman) <lostonamountain@gmail.com>
 #
-# All Rights Reserved.
+# See LICENSE
 
 require 'github_api'
 require 'socket'
