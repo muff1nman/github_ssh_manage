@@ -9,8 +9,16 @@ require 'socket'
 require 'etc'
 
 SSH_KEY_PATH = File.join(ENV['HOME'],'.ssh')
+LOCAL_SSH_REGEX = /^(ssh\S*\s+\S*)\s+\S+$/
 
-local_public_keys = Dir.glob( File.join(SSH_KEY_PATH, '*.pub')).map { |key_filename| (File.read key_filename).chomp }.to_set
+local_public_keys = Dir.glob( File.join(SSH_KEY_PATH, '*.pub')).map do |key_filename|
+  raw = (File.read key_filename).chomp
+  puts raw
+  matched = LOCAL_SSH_REGEX.match raw
+  abort "Unknown local ssh key format" if matched.nil?
+  matched[1]
+end
+local_public_keys = local_public_keys.to_set
 puts local_public_keys.inspect
 
 github = Github.new basic_auth: ENV['GITHUB_AUTH']
