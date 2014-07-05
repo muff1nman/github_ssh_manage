@@ -28,7 +28,8 @@ keys_in_both = github_keys_key_only & local_public_keys
 keys_only_local = local_public_keys - github_keys_key_only
 
 if !keys_in_both.empty?
-  exit 0
+  puts "Identity already present on github"
+  exit 20
 elsif !keys_only_local.empty?
   title_for_key = "#{Etc.getlogin}@#{Socket.gethostbyname(Socket.gethostname).first}"
   push_to_github = keys_only_local.first
@@ -39,6 +40,7 @@ elsif !keys_only_local.empty?
   end
   github.users.keys.create "title" => title_for_key, "key"=> push_to_github
   puts "#{title_for_key} added successfully"
+  exit 0
 else
   abort "No public keys were found on github for #{SSH_KEY_PATH} and there was none to upload to github"
 end
