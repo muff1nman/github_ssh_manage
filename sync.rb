@@ -13,25 +13,19 @@ LOCAL_SSH_REGEX = /^(ssh\S*\s+\S*)\s+\S+$/
 
 local_public_keys = Dir.glob( File.join(SSH_KEY_PATH, '*.pub')).map do |key_filename|
   raw = (File.read key_filename).chomp
-  puts raw
   matched = LOCAL_SSH_REGEX.match raw
   abort "Unknown local ssh key format" if matched.nil?
   matched[1]
 end
 local_public_keys = local_public_keys.to_set
-puts local_public_keys.inspect
 
 github = Github.new basic_auth: ENV['GITHUB_AUTH']
 github_keys = github.users.keys.list.to_set
 github_keys_key_only = github_keys.map { |key| key.fetch 'key' }.to_set
-puts github_keys_key_only.inspect
-puts github_keys.map { |key| key.title }.inspect
 
 keys_in_both = github_keys_key_only & local_public_keys
-puts "Keys in both github and local:#{keys_in_both}"
 
 keys_only_local = local_public_keys - github_keys_key_only
-puts "Keys unique to local:#{keys_only_local.inspect}" 
 
 if !keys_in_both.empty?
   exit 0
