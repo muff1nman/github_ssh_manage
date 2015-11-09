@@ -32,10 +32,6 @@ if !keys_in_both.empty?
   exit 20
 elsif !keys_only_local.empty?
   name = Socket.gethostname
-  begin
-    name = Socket.gethostbyname(name).first
-  rescue SocketError => e
-  end
   title_for_key = "#{Etc.getlogin}@#{name}"
   push_to_github = keys_only_local.first
   puts "pushing key #{push_to_github} to github as identity #{title_for_key}"
