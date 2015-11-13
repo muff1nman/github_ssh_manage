@@ -37,7 +37,8 @@ elsif !keys_only_local.empty?
   puts "pushing key #{push_to_github} to github as identity #{title_for_key}"
   title_already_used = github_keys.any? { |github_key| github_key.title.casecmp(title_for_key).zero? }
   if title_already_used
-    abort "a key already exists on github for this identity (#{title_for_key})"
+    puts "Deleting existing key #{title_for_key}"
+    github.users.keys.delete "title" => title_for_key
   end
   github.users.keys.create "title" => title_for_key, "key"=> push_to_github
   puts "#{title_for_key} added successfully"
