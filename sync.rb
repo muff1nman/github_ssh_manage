@@ -38,8 +38,8 @@ elsif !keys_only_local.empty?
   conflicting_keys = github_keys.select { |github_key| github_key.title.casecmp(title_for_key).zero? }
   if conflicting_keys.size > 1
     abort "Two conflicting keys on github? Weird."
-  elsif conflicting_keys.size = 1
-    key_to_remove = conflicting_key.first
+  elsif conflicting_keys.size == 1
+    key_to_remove = conflicting_keys.first
     puts "Deleting existing key #{key_to_remove.title}"
     github.users.keys.delete key_to_remove.id
   end
