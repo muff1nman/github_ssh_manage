@@ -35,10 +35,13 @@ elsif !keys_only_local.empty?
   title_for_key = "#{Etc.getlogin}@#{name}"
   push_to_github = keys_only_local.first
   puts "pushing key #{push_to_github} to github as identity #{title_for_key}"
-  title_already_used = github_keys.any? { |github_key| github_key.title.casecmp(title_for_key).zero? }
-  if title_already_used
-    puts "Deleting existing key #{title_for_key}"
-    github.users.keys.delete "title" => title_for_key
+  conflicting_keys = github_keys.select { |github_key| github_key.title.casecmp(title_for_key).zero? }
+  if conflicting_keys.size > 1
+    abort "Two conflicting keys on github? Weird."
+  elsif conflicting_keys.size = 1
+    key_to_remove = conflicting_key.first
+    puts "Deleting existing key #{key_to_remove.title}"
+    github.users.keys.delete key_to_remove.id
   end
   github.users.keys.create "title" => title_for_key, "key"=> push_to_github
   puts "#{title_for_key} added successfully"
