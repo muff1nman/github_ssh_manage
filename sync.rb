@@ -27,24 +27,25 @@ keys_in_both = github_keys_key_only & local_public_keys
 
 keys_only_local = local_public_keys - github_keys_key_only
 
-if !keys_in_both.empty?
-  puts "Identity already present on github"
+if keys_only_local.empty?
+  puts "Identities already present on github"
   exit 20
 elsif !keys_only_local.empty?
-  name = Socket.gethostname
-  title_for_key = "#{Etc.getlogin}@#{name}"
-  push_to_github = keys_only_local.first
-  puts "pushing key #{push_to_github} to github as identity #{title_for_key}"
-  conflicting_keys = github_keys.select { |github_key| github_key.title.casecmp(title_for_key).zero? }
-  if conflicting_keys.size > 1
-    abort "Two conflicting keys on github? Weird."
-  elsif conflicting_keys.size == 1
-    key_to_remove = conflicting_keys.first
-    puts "Deleting existing key #{key_to_remove.title}"
-    github.users.keys.delete key_to_remove.id
+  keys_only_local.each do |key|
+    name = Socket.gethostname
+    title_for_key = "#{Etc.getlogin}@#{name}"
+    puts "pushing key #{key} to github as identity #{title_for_key}"
+    conflicting_keys = github_keys.select { |github_key| github_key.title.casecmp(title_for_key).zero? }
+    if conflicting_keys.size > 1
+      abort "Two conflicting keys on github? Weird."
+    elsif conflicting_keys.size == 1
+      key_to_remove = conflicting_keys.first
+      puts "Deleting existing key #{key_to_remove.title}"
+      github.users.keys.delete key_to_remove.id
+    end
+    github.users.keys.create "title" => title_for_key, "key"=> key
+    puts "#{title_for_key} added successfully"
   end
-  github.users.keys.create "title" => title_for_key, "key"=> push_to_github
-  puts "#{title_for_key} added successfully"
   exit 0
 else
   abort "No public keys were found on github for #{SSH_KEY_PATH} and there was none to upload to github"
